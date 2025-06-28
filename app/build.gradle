@@ -1,0 +1,55 @@
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
+}
+
+android {
+    namespace 'com.yorick.templatemap'
+    compileSdk libs.versions.compile.sdk.version.get().toInteger()
+
+    defaultConfig {
+        applicationId "com.yorick.templatemap"
+        minSdk libs.versions.min.sdk.version.get().toInteger()
+        targetSdk libs.versions.target.sdk.version.get().toInteger()
+        targetSdk 36
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_19
+        targetCompatibility JavaVersion.VERSION_19
+    }
+    kotlinOptions {
+        jvmTarget = '19'
+    }
+    buildFeatures {
+        compose true
+    }
+}
+
+dependencies {
+
+    implementation project(':common')
+
+    implementation libs.androidx.lifecycle.runtime.ktx
+    implementation libs.androidx.activity.compose
+    implementation libs.androidx.ui.graphics
+
+    testImplementation libs.junit
+    androidTestImplementation libs.androidx.junit
+    androidTestImplementation libs.androidx.espresso.core
+    androidTestImplementation platform(libs.androidx.compose.bom)
+    androidTestImplementation libs.androidx.ui.test.junit4
+    debugImplementation libs.androidx.ui.tooling
+    debugImplementation libs.androidx.ui.test.manifest
+}
