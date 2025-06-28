@@ -4,7 +4,31 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
 android {
+    signingConfigs {
+        debug {
+            if (keystorePropertiesFile.exists()) {
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+        release {
+            if (keystorePropertiesFile.exists()) {
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
     namespace 'com.yorick.templatemap'
     compileSdk libs.versions.compile.sdk.version.get().toInteger()
 
@@ -12,7 +36,6 @@ android {
         applicationId "com.yorick.templatemap"
         minSdk libs.versions.min.sdk.version.get().toInteger()
         targetSdk libs.versions.target.sdk.version.get().toInteger()
-        targetSdk 36
         versionCode 1
         versionName "1.0"
 

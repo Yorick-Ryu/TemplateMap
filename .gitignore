@@ -12,5 +12,8 @@ misc.xml
 deploymentTargetDropDown.xml
 render.experimental.xml
 
+# Signing configurations
+keystore.properties
+
 .DS_Store
 /build
