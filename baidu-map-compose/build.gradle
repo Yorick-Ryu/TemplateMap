@@ -1,0 +1,46 @@
+plugins {
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+    id 'kotlin-parcelize'
+    alias(libs.plugins.kotlin.compose)
+}
+
+android {
+    namespace 'com.melody.map.baidu_compose'
+    compileSdk libs.versions.compile.sdk.version.get().toInteger()
+
+    defaultConfig {
+        minSdk libs.versions.min.sdk.version.get().toInteger()
+        targetSdk libs.versions.target.sdk.version.get().toInteger()
+        consumerProguardFiles "consumer-rules.pro"
+    }
+    buildFeatures {
+        compose true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    kotlinOptions {
+        jvmTarget = '19'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_19
+        targetCompatibility JavaVersion.VERSION_19
+    }
+    lint {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+}
+
+dependencies {
+    implementation platform(libs.androidx.compose.bom)
+    implementation libs.androidx.ui
+    implementation libs.androidx.lifecycle.runtime.ktx
+
+    // 地图组件
+    implementation libs.baidu.map
+}
