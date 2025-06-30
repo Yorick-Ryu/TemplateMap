@@ -30,7 +30,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import androidx.core.content.ContextCompat.startActivity
 import com.yorick.common.R
 
 
@@ -138,7 +137,7 @@ fun OpenLocationDialog(
                 Uri.fromParts("package", context.packageName, null)
             )
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            startActivity(context, intent, null)
+            context.startActivity(intent, null)
         }
     )
 }

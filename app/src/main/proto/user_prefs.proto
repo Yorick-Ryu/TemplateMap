@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option java_package = "com.yorick.templatemap.data.datastore";
+option java_multiple_files = true;
+
+enum DarkThemeConfigProto {
+  DARK_THEME_CONFIG_UNSPECIFIED = 0;
+  DARK_THEME_CONFIG_FOLLOW_SYSTEM = 1;
+  DARK_THEME_CONFIG_LIGHT = 2;
+  DARK_THEME_CONFIG_DARK = 3;
+}
+
+message UserPref {
+
+  // UI
+  DarkThemeConfigProto dark_theme_config = 1;
+  bool use_dynamic_color = 2;
+
+}

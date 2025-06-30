@@ -13,6 +13,43 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.core.net.toUri
 import java.security.MessageDigest
 
+fun <T : Any> ActivityResultLauncher<T>.safeLaunch(input: T?) {
+    if (null == input) {
+        Log.e("AppUtils", "safeLaunch(T): input = null")
+        return
+    }
+    val launchResult = kotlin.runCatching {
+        launch(input)
+    }
+    if (launchResult.isFailure) {
+        Log.e("AppUtils", "safeLaunch(T),Exception:${launchResult.exceptionOrNull()?.message}")
+    }
+}
+
+/**
+ * 打开App权限设置页面
+ */
+fun openAppPermissionSettingPage(context: Context) {
+    val packageName = context.packageName
+    try {
+        val intent = Intent().apply {
+            action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+            data = "package:$packageName".toUri()
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(intent)
+    } catch (e: ActivityNotFoundException) {
+        try {
+            // 往设置页面跳
+            context.startActivity(Intent(Settings.ACTION_SETTINGS).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            })
+        } catch (ignore: ActivityNotFoundException) {
+            // 有些手机跳系统设置也会崩溃
+        }
+    }
+}
+
 object CommonUtils {
 
     // 添加位图缓存
@@ -71,43 +108,6 @@ object CommonUtils {
 
     fun getSDCardPtah(): String {
         return Environment.getExternalStorageDirectory().toString()
-    }
-
-    fun <T : Any> ActivityResultLauncher<T>.safeLaunch(input: T?) {
-        if (null == input) {
-            Log.e("AppUtils", "safeLaunch(T): input = null")
-            return
-        }
-        val launchResult = kotlin.runCatching {
-            launch(input)
-        }
-        if (launchResult.isFailure) {
-            Log.e("AppUtils", "safeLaunch(T),Exception:${launchResult.exceptionOrNull()?.message}")
-        }
-    }
-
-    /**
-     * 打开App权限设置页面
-     */
-    fun openAppPermissionSettingPage(context: Context) {
-        val packageName = context.packageName
-        try {
-            val intent = Intent().apply {
-                action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                data = "package:$packageName".toUri()
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
-            context.startActivity(intent)
-        } catch (e: ActivityNotFoundException) {
-            try {
-                // 往设置页面跳
-                context.startActivity(Intent(Settings.ACTION_SETTINGS).apply {
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                })
-            } catch (ignore: ActivityNotFoundException) {
-                // 有些手机跳系统设置也会崩溃
-            }
-        }
     }
 
     fun dialPhoneNumber(context: Context, phoneNumber: String) {

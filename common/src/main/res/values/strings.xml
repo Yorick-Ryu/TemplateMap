@@ -32,7 +32,7 @@
     <string name="dynamic_color_desc">根据你的壁纸计算主题色</string>
     <string name="value">值</string>
     <string name="restore">恢复</string>
-    <string name="restore_confirm">确认重置所有设置并退出登录吗？</string>
+    <string name="restore_confirm">确认重置所有设置吗？</string>
     <string name="exit_confirm">确认退出登录？</string>
     <string name="config">配置</string>
     <string name="password_invalid">密码错误</string>
@@ -70,4 +70,6 @@
     <string name="service_feedback_desc">软件使用遇到问题？点击拨打客服热线</string>
     <string name="network_unavailable">网络连接已断开</string>
     <string name="network_unavailable_desc">请检查您的网络连接</string>
+    <string name="switch_map">切换地图</string>
+    <string name="map_label">地图标签</string>
 </resources>

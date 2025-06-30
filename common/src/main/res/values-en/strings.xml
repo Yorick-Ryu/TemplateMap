@@ -33,10 +33,9 @@
     <string name="dynamic_color_desc">Calculate the theme color by wallpaper</string>
     <string name="value">Value</string>
     <string name="restore">Restore</string>
-    <string name="restore_confirm">Confirm resetting all settings and logging out?</string>
+    <string name="restore_confirm">Confirm resetting all settings?</string>
     <string name="exit_confirm">Confirm logging out?</string>
     <string name="config">Config</string>
-    <string name="command_center_mode">Command Center Mode</string>
     <string name="command_center_mode_desc">Access requires Command Center authorization password.</string>
     <string name="command_center_mode_confirm">Please enter the Command Center authorization password. Changes will take effect after you log in again!</string>
     <string name="password_invalid">Invalid Password</string>
@@ -74,4 +73,6 @@
     <string name="service_feedback_desc">Having issues with the software? Click to call customer service</string>
     <string name="network_unavailable">Network Unavailable</string>
     <string name="network_unavailable_desc">Please check your network connection</string>
+    <string name="switch_map">Switch Map</string>
+    <string name="map_label">Map Label</string>
 </resources>

@@ -1,0 +1,3 @@
+-keep class com.yorick.common.data.model.** { *; }
+-keep class com.yorick.common.data.utils.** { *; }
+-keep class com.yorick.common.ui.** { *; }
