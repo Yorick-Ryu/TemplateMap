@@ -80,7 +80,7 @@ fun TraceOverlay(
     ComposeNode<TraceOverlayNode, MapApplier>(
         factory = {
             val listener = object : TraceAnimationListener {
-                override fun onTraceAnimationUpdate(p0: Float) {
+                override fun onTraceAnimationUpdate(p0: Int) {
                 }
                 override fun onTraceUpdatePosition(p0: LatLng?) {
                 }
