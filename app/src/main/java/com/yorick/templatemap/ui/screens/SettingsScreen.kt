@@ -1,5 +1,6 @@
 package com.yorick.templatemap.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,10 +12,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.BrightnessAuto
 import androidx.compose.material.icons.outlined.ColorLens
 import androidx.compose.material.icons.outlined.DarkMode
+import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.SettingsBackupRestore
-import androidx.compose.material.icons.outlined.SupportAgent
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -30,6 +33,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -38,6 +42,8 @@ import androidx.compose.ui.res.stringResource
 import com.yorick.common.R
 import com.yorick.common.data.model.DarkThemeConfig
 import com.yorick.common.data.utils.CommonUtils
+import com.yorick.common.data.utils.LogUtils
+import com.yorick.common.data.utils.ShareLogResult
 import com.yorick.common.ui.components.AppTopBar
 import com.yorick.common.ui.components.ClassRow
 import com.yorick.common.ui.components.ConfirmDialog
@@ -46,6 +52,8 @@ import com.yorick.common.ui.components.SingleRowListItem
 import com.yorick.common.ui.theme.supportsDynamicTheming
 import com.yorick.templatemap.data.model.UserData
 import com.yorick.templatemap.ui.viewmodels.SettingViewModel
+import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @Composable
 fun SettingsScreen(
@@ -55,6 +63,7 @@ fun SettingsScreen(
     supportDynamicColor: Boolean = supportsDynamicTheming()
 ) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     var isExpanded by remember { mutableStateOf(false) }
     var themeIcon: ImageVector by remember { mutableStateOf(Icons.Outlined.BrightnessAuto) }
     var isOpenRestoreDialog by remember { mutableStateOf(false) }
@@ -157,15 +166,65 @@ fun SettingsScreen(
                     }
                 }
             }
-            ClassRow(className = stringResource(id = R.string.about)) {
+            ClassRow(className = "日志") {
                 DualRowListItem(
                     modifier = Modifier.clickable {
-                        CommonUtils.dialPhoneNumber(context, "13888888888")
+                        coroutineScope.launch {
+                            when (val result = LogUtils.shareLogFiles(context)) {
+                                is ShareLogResult.NoLogs -> {
+                                    Toast.makeText(
+                                        context,
+                                        "没有日志文件可以分享",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+
+                                is ShareLogResult.Failed -> {
+                                    Toast.makeText(
+                                        context,
+                                        "日志文件分享失败：${result.error.message}",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+
+                                ShareLogResult.Success -> {
+                                    Timber.i("日志文件分享成功")
+                                }
+                            }
+                        }
                     },
-                    icon = Icons.Outlined.SupportAgent,
-                    name = stringResource(id = R.string.service_feedback),
-                    desc = stringResource(id = R.string.service_feedback_desc),
+                    icon = Icons.Outlined.Share,
+                    name = "分享日志",
+                    desc = "导出并分享应用日志文件"
                 )
+                DualRowListItem(
+                    modifier = Modifier.clickable {
+                        coroutineScope.launch {
+                            val success = LogUtils.clearLogFiles(context)
+                            if (success) {
+                                Toast.makeText(context, "日志文件清除成功", Toast.LENGTH_SHORT)
+                                    .show()
+                            } else {
+                                Toast.makeText(context, "部分日志文件清除失败", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                        }
+                    },
+                    icon = Icons.Outlined.Description,
+                    name = "清除日志",
+                    desc = "删除所有本地日志文件"
+                )
+                ClassRow(className = stringResource(id = R.string.about)) {
+                    SingleRowListItem(
+                        icon = Icons.Outlined.Info,
+                        name = "版本",
+                    ) {
+                        Text(
+                            text = CommonUtils.getVersionName(context = context),
+                            style = MaterialTheme.typography.labelMedium
+                        )
+                    }
+                }
             }
         }
     }

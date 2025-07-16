@@ -1,20 +1,11 @@
 package com.yorick.templatemap.ui.screens
 
-import android.util.Log
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
+import android.Manifest
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Map
-import androidx.compose.material.icons.filled.MyLocation
-import androidx.compose.material.icons.outlined.Layers
-import androidx.compose.material.icons.outlined.LayersClear
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,32 +16,114 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.baidu.mapapi.map.BitmapDescriptorFactory
-import com.melody.map.baidu_compose.BDMap
-import com.melody.map.baidu_compose.model.BDCameraPosition
-import com.melody.map.baidu_compose.overlay.Marker
-import com.melody.map.baidu_compose.overlay.rememberMarkerState
-import com.melody.map.baidu_compose.poperties.MapProperties
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.google.accompanist.permissions.shouldShowRationale
 import com.melody.map.baidu_compose.position.CameraPositionState
-import com.yorick.common.R
 import com.yorick.common.ui.components.AppTopBar
-import com.yorick.templatemap.ui.viewmodels.AppUiState
+import com.yorick.common.ui.components.OpenGpsDialog
+import com.yorick.common.ui.components.OpenLocationDialog
+import com.yorick.common.ui.components.handlerGPSLauncher
+import com.yorick.templatemap.ui.map.MapActions
+import com.yorick.templatemap.ui.map.MapContent
 import com.yorick.templatemap.ui.viewmodels.LocationUiState
+import com.yorick.templatemap.ui.viewmodels.LocationViewModel
+import timber.log.Timber
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MapScreen(
-    appUiState: AppUiState,
+    locationViewModel: LocationViewModel,
     locationUiState: LocationUiState,
     cameraPositionState: CameraPositionState,
-    startLocation: () -> Unit,
-    stopLocation: () -> Unit,
     onClickLocation: () -> Unit,
     onToggleMapType: () -> Unit,
     onToggleMapLabels: () -> Unit
 ) {
+
+    val TAG = "MapScreen"
+
+    // 定位相关权限Start
+    val locationPermissions = rememberMultiplePermissionsState(
+        permissions = listOf(
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+        )
+    )
+
+    val fineLocationPermission = locationPermissions.permissions.find {
+        it.permission == Manifest.permission.ACCESS_FINE_LOCATION
+    }
+
+    val coarseLocationPermission = locationPermissions.permissions.find {
+        it.permission == Manifest.permission.ACCESS_COARSE_LOCATION
+    }
+
+    var showLocationRationalDialog by remember { mutableStateOf(false) }
+
+    val hasLocationPermission = fineLocationPermission?.status?.isGranted == true ||
+            coarseLocationPermission?.status?.isGranted == true
+
+    if (showLocationRationalDialog) {
+        OpenLocationDialog(
+            onDismissRequest = { showLocationRationalDialog = false },
+        )
+    }
+
+    LaunchedEffect(locationPermissions) {
+        if (!locationPermissions.allPermissionsGranted) {
+            if (locationPermissions.shouldShowRationale) {
+                if (fineLocationPermission?.status?.shouldShowRationale == true ||
+                    coarseLocationPermission?.status?.shouldShowRationale == true
+                ) {
+                    showLocationRationalDialog = true
+                }
+            } else {
+                locationPermissions.launchMultiplePermissionRequest()
+            }
+        }
+    }
+
+    // 权限状态日志
+    LaunchedEffect(
+        locationPermissions.permissions,
+        locationPermissions.allPermissionsGranted
+    ) {
+        Timber.tag(TAG).d("精确定位权限状态: ${fineLocationPermission?.status?.isGranted}")
+        Timber.tag(TAG).d("粗略定位权限状态: ${coarseLocationPermission?.status?.isGranted}")
+        Timber.tag(TAG).d("定位权限状态: $hasLocationPermission")
+        Timber.tag(TAG).d("定位权限全部授予: ${locationPermissions.allPermissionsGranted}")
+    }
+
+    LaunchedEffect(hasLocationPermission) {
+        if (hasLocationPermission) {
+            locationViewModel.startMapLocation()
+        }
+    }
+    // 定位相关权限End
+
+    // 检查GPS是否打开Start
+    LaunchedEffect(Unit) {
+        locationViewModel.checkGpsStatus()
+    }
+
+    val openGpsLauncher = handlerGPSLauncher(locationViewModel::checkGpsStatus)
+
+    if (locationUiState.isShowOpenGPSDialog) {
+        OpenGpsDialog(
+            onDismissRequest = {
+                locationViewModel.updateIsShowOpenGPSDialog(
+                    isShowOpenGPSDialog = false
+                )
+            },
+            onConfirm = { locationViewModel.openGPSPermission(openGpsLauncher) }
+        )
+    }
+    // 检查GPS是否打开End
+
 
     Column(modifier = Modifier.fillMaxSize()) {
         AppTopBar(
@@ -71,125 +144,17 @@ fun MapScreen(
             )
 
             MapActions(
-                modifier = Modifier.align(Alignment.BottomEnd),
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(
+                        end = 12.dp
+                    ),
                 mapProperties = locationUiState.mapProperties,
                 onClickLocation = onClickLocation,
                 onToggleMapType = onToggleMapType,
                 onToggleMapLabels = onToggleMapLabels,
-            )
-        }
-    }
-}
-
-@Composable
-fun MapContent(
-    modifier: Modifier,
-    locationUiState: LocationUiState,
-    cameraPositionState: CameraPositionState
-) {
-    val TAG = "MapContent"
-    var isMapLoaded by remember { mutableStateOf(false) }
-
-    LaunchedEffect(isMapLoaded, locationUiState.locationLatLng) {
-        if (isMapLoaded && locationUiState.locationLatLng != null) {
-            cameraPositionState.position =
-                BDCameraPosition(locationUiState.locationLatLng, 18F, 0f, 0f)
-            Log.d(TAG, "MapContent: Updating camera position to ${locationUiState.locationLatLng}")
-        }
-    }
-
-    BDMap(
-        modifier = modifier.fillMaxSize(),
-        cameraPositionState = cameraPositionState,
-        properties = locationUiState.mapProperties,
-        uiSettings = locationUiState.mapUiSettings,
-        locationSource = locationUiState.locationSource,
-        onMapLoaded = {
-            isMapLoaded = true
-            Log.d(TAG, "onMapLoaded")
-        }
-    ) {
-        // 当前定位蓝点
-        locationUiState.locationLatLng?.let {
-            Marker(
-                icon = BitmapDescriptorFactory.fromResource(R.drawable.ic_map_location_self),
-                state = rememberMarkerState(position = it),
-                rotation = -(locationUiState.locationSource?.direction ?: 0.0f),
-                anchor = Offset(0.5f, 0.5f),
-                isClickable = false,
-                zIndex = 100
-            )
-        }
-    }
-}
-
-@Composable
-fun MapActions(
-    modifier: Modifier,
-    mapProperties: MapProperties,
-    onClickLocation: () -> Unit,
-    onToggleMapType: () -> Unit,
-    onToggleMapLabels: () -> Unit
-) {
-    Column(
-        modifier = modifier.padding(bottom = 110.dp, end = 10.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        // 地图类型切换
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            IconButton(
-                onClick = onToggleMapType,
-                modifier = Modifier.background(
-                    color = MaterialTheme.colorScheme.inverseOnSurface,
-                    shape = MaterialTheme.shapes.small
-                )
-            ) {
-                Icon(imageVector = Icons.Default.Map, contentDescription = null)
-            }
-            Text(
-                text = stringResource(id = R.string.switch_map),
-                style = MaterialTheme.typography.labelSmall
-            )
-        }
-
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            IconButton(
-                onClick = onToggleMapLabels,
-                modifier = Modifier.background(
-                    color = MaterialTheme.colorScheme.inverseOnSurface,
-                    shape = MaterialTheme.shapes.small
-                )
-            ) {
-                Icon(
-                    imageVector = if (mapProperties.isShowMapLabels) {
-                        Icons.Outlined.Layers
-                    } else {
-                        Icons.Outlined.LayersClear
-                    },
-                    contentDescription = null
-                )
-            }
-            Text(
-                text = stringResource(id = R.string.map_label),
-                style = MaterialTheme.typography.labelSmall
-            )
-        }
-
-        // 定位按钮
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            IconButton(
-                onClick = onClickLocation,
-                modifier = Modifier.background(
-                    color = MaterialTheme.colorScheme.inverseOnSurface,
-                    shape = MaterialTheme.shapes.small
-                )
-            ) {
-                Icon(imageVector = Icons.Default.MyLocation, contentDescription = null)
-            }
-            Text(
-                text = stringResource(id = R.string.location),
-                style = MaterialTheme.typography.labelSmall
+                onZoomIn = { locationViewModel.zoomIn(cameraPositionState) },
+                onZoomOut = { locationViewModel.zoomOut(cameraPositionState) }
             )
         }
     }

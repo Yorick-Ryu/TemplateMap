@@ -5,13 +5,8 @@ import com.baidu.location.LocationClient
 import com.baidu.mapapi.CoordType
 import com.baidu.mapapi.SDKInitializer
 import com.baidu.mapapi.common.BaiduMapSDKException
-import com.baidu.mapapi.model.LatLng
 
 object BDMapUtils {
-
-    // 添加公里点缓存
-    private var cachedPoints: List<LatLng>? = null
-    private var cachedKilometerPoints: List<Pair<LatLng, Int>>? = null
 
     fun updateMapViewPrivacy(context: Context) {
         SDKInitializer.setAgreePrivacy(context, true)

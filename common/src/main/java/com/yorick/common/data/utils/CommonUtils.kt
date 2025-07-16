@@ -7,23 +7,28 @@ import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.os.Environment
 import android.provider.Settings
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.net.toUri
+import timber.log.Timber
 import java.security.MessageDigest
 
 fun <T : Any> ActivityResultLauncher<T>.safeLaunch(input: T?) {
     if (null == input) {
-        Log.e("AppUtils", "safeLaunch(T): input = null")
+        Timber.tag("AppUtils").e("safeLaunch(T): input = null")
         return
     }
     val launchResult = kotlin.runCatching {
         launch(input)
     }
     if (launchResult.isFailure) {
-        Log.e("AppUtils", "safeLaunch(T),Exception:${launchResult.exceptionOrNull()?.message}")
+        Timber.tag("AppUtils")
+            .e("safeLaunch(T),Exception:${launchResult.exceptionOrNull()?.message}")
     }
+}
+
+fun getVersionName(context: Context): String {
+    return context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "Unknow"
 }
 
 /**
@@ -59,10 +64,9 @@ object CommonUtils {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
 
-    fun getVersionName(context: Context): String? {
-        return context.packageManager.getPackageInfo(context.packageName, 0).versionName
+    fun getVersionName(context: Context): String {
+        return context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "Unknow"
     }
-
     fun openIgnoreBatteryOptimizations(context: Context) {
         showToast(context, "请找到本应用，并忽略电池优化，如果没跳转代表已经打开电池优化。")
         val packageName = context.packageName

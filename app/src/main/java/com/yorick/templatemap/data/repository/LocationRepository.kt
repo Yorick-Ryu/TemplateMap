@@ -46,7 +46,7 @@ class LocationRepository(
     fun initMapUiSettings(): MapUiSettings {
         return MapUiSettings(
             isZoomGesturesEnabled = true,
-            isZoomEnabled = true,
+            isZoomEnabled = false,
             isScaleControlsEnabled = true,
             isDoubleClickZoomEnabled = true,
             isScrollGesturesEnabled = true,

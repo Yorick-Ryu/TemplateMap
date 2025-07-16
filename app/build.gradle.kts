@@ -16,6 +16,8 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
+val betaVersion = 1
+
 android {
     signingConfigs {
         getByName("debug") {
@@ -43,12 +45,15 @@ android {
         minSdk = libs.versions.min.sdk.version.get().toInt()
         targetSdk = libs.versions.target.sdk.version.get().toInt()
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
+        getByName("debug") {
+            versionNameSuffix = "-debug-beta$betaVersion"
+        }
         getByName("release") {
             isMinifyEnabled = true
             proguardFiles(
@@ -60,6 +65,36 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+}
+
+
+// 配置APK输出文件名
+android.applicationVariants.all {
+    val variant = this
+    val buildType = variant.buildType.name
+    val versionName = variant.versionName
+
+    variant.outputs.all {
+        val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+
+        val outputFileName = when (buildType) {
+            "release" -> {
+                // release版本: app-v1.0.0.apk
+                "${rootProject.name}-v${versionName}.apk"
+            }
+
+            "debug" -> {
+                // debug版本: app-v1.0.0-debug-betaX.apk
+                "${rootProject.name}-v${versionName}.apk"
+            }
+
+            else -> {
+                "${rootProject.name}-v${versionName}-${buildType}.apk"
+            }
+        }
+
+        output.outputFileName = outputFileName
     }
 }
 
