@@ -232,7 +232,11 @@ common/src/main/java/com/yorick/common/
 
 本项目基于 MIT 许可证开源，详见 [LICENSE](LICENSE) 文件。
 
-百度地图 Compose 封装库部分基于 [OmniMap](https://github.com/TheMelody/OmniMap) 项目，感谢原作者的贡献。
+### 第三方库许可
+
+- 百度地图 Compose 封装库部分基于 [OmniMap](https://github.com/TheMelody/OmniMap) 项目，感谢原作者的贡献
+- 本项目使用的所有第三方库均遵循各自的开源许可协议
+- 百度地图 SDK 的使用需遵循百度地图开放平台的服务条款
 
 ## 🤝 贡献
 
