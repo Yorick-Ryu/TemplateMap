@@ -126,7 +126,6 @@ protobuf {
 dependencies {
 
     implementation(project(":common"))
-    implementation(project(":baidu-map-compose"))
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.ui.graphics)
@@ -138,10 +137,6 @@ dependencies {
     // Protobuf  DataStore
     implementation(libs.androidx.datastore)
     implementation(libs.protobuf.kotlin.lite)
-
-    // Okhttp
-    implementation(libs.okhttp)
-    implementation(libs.okhttp.logging.interceptor)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

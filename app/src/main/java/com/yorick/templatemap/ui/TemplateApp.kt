@@ -14,7 +14,6 @@ import com.yorick.templatemap.data.model.UserData
 import com.yorick.templatemap.ui.navigation.AppRoute
 import com.yorick.templatemap.ui.screens.MainScreen
 import com.yorick.templatemap.ui.viewmodels.AppViewModel
-import com.yorick.templatemap.ui.viewmodels.LocationViewModel
 import com.yorick.templatemap.ui.viewmodels.SettingViewModel
 
 @Composable
@@ -22,14 +21,12 @@ fun TemplateMapApp(
     modifier: Modifier = Modifier,
     settingViewModel: SettingViewModel = viewModel(),
     appViewModel: AppViewModel = viewModel(),
-    locationViewModel: LocationViewModel = viewModel(),
     uiState: SettingsUiState
 ) {
     val userData =
         if (uiState is SettingsUiState.Success) uiState.userData as UserData else UserData()
 
     val appUiState by appViewModel.uiState.collectAsStateWithLifecycle()
-    val locationUiState by locationViewModel.uiState.collectAsStateWithLifecycle()
 
     val navController = rememberNavController()
 
@@ -44,23 +41,12 @@ fun TemplateMapApp(
         )
     }
 
-    // 显示错误对话框 - LocationViewModel
-    locationUiState.error?.let { error ->
-        ErrorDialog(
-            error = error,
-            onDismiss = {
-                locationViewModel.clearError()
-            }
-        )
-    }
-
     NavHost(
         modifier = modifier,
         navController = navController, startDestination = AppRoute.MAIN
     ) {
         composable(AppRoute.MAIN) {
             MainScreen(
-                locationViewModel = locationViewModel,
                 settingViewModel = settingViewModel,
                 appUiState = appUiState,
                 userData = userData,

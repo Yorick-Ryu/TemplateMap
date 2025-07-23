@@ -20,18 +20,6 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
-# Baidu Map
--keep class com.baidu.** {*;}
--keep class vi.com.** {*;}
--keep class com.baidu.vi.** {*;}
--dontwarn com.baidu.**
-
-# OkHttp
--keep class okhttp3.** { *; }
--keep interface okhttp3.** { *; }
--dontwarn okhttp3.**
--dontwarn okio.**
-
 # Keep DataStore fields
 -dontwarn com.google.protobuf.**
 -keep class com.google.protobuf.** { *;}

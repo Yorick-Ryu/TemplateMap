@@ -1,14 +1,11 @@
 package com.yorick.templatemap.data.di
 
 import android.content.Context
-import android.location.LocationManager
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.dataStoreFile
-import com.baidu.location.LocationClient
 import com.yorick.templatemap.data.datastore.UserDataSerializer
 import com.yorick.templatemap.data.datastore.UserPref
-import com.yorick.templatemap.data.repository.LocationRepository
 import com.yorick.templatemap.data.repository.UserDataRepository
 import dagger.Module
 import dagger.Provides
@@ -38,13 +35,4 @@ object RepositoryModule {
         return UserDataRepository(dataStore)
     }
 
-    @Provides
-    @Singleton
-    fun provideLocationRepository(@ApplicationContext appContext: Context): LocationRepository {
-        return LocationRepository(
-            appContext,
-            appContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager,
-            LocationClient(appContext)
-        )
-    }
 }

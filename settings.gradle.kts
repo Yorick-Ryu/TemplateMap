@@ -22,4 +22,3 @@ dependencyResolutionManagement {
 rootProject.name = "TemplateMap"
 include(":app")
 include(":common")
-include(":baidu-map-compose")
