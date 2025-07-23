@@ -17,7 +17,7 @@ import com.yorick.templatemap.ui.viewmodels.AppViewModel
 import com.yorick.templatemap.ui.viewmodels.SettingViewModel
 
 @Composable
-fun TemplateMapApp(
+fun TemplateApp(
     modifier: Modifier = Modifier,
     settingViewModel: SettingViewModel = viewModel(),
     appViewModel: AppViewModel = viewModel(),

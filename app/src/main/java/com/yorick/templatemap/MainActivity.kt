@@ -19,7 +19,7 @@ import com.yorick.common.data.model.SettingsUiState
 import com.yorick.common.ui.theme.AppTheme
 import com.yorick.common.ui.theme.shouldUseDarkTheme
 import com.yorick.common.ui.theme.useDynamicTheming
-import com.yorick.templatemap.ui.TemplateMapApp
+import com.yorick.templatemap.ui.TemplateApp
 import com.yorick.templatemap.ui.viewmodels.SettingViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
                 darkTheme = darkTheme,
                 dynamicColor = useDynamicTheming(uiState)
             ) {
-                TemplateMapApp(
+                TemplateApp(
                     modifier = Modifier.fillMaxSize(),
                     settingViewModel = settingViewModel,
                     uiState = uiState
