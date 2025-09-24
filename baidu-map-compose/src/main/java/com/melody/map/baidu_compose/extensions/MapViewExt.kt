@@ -23,11 +23,11 @@
 package com.melody.map.baidu_compose.extensions
 
 import com.baidu.mapapi.map.BaiduMap
-import com.baidu.mapapi.map.MapView
+import com.baidu.mapapi.map.TextureMapView
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-internal suspend inline fun MapView.awaitMap(): BaiduMap =
+internal suspend inline fun TextureMapView.awaitMap(): BaiduMap =
     suspendCoroutine { continuation ->
         continuation.resume(map)
     }

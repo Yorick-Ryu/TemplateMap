@@ -25,7 +25,6 @@ package com.melody.map.baidu_compose
 import android.content.Context
 import androidx.compose.runtime.*
 import com.baidu.mapapi.map.BaiduMap
-import com.baidu.mapapi.map.MapView
 import com.baidu.mapapi.map.Marker
 import com.baidu.mapapi.map.MultiPointItem
 import com.baidu.mapapi.map.Polyline

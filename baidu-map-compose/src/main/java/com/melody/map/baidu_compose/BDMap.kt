@@ -44,8 +44,8 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.baidu.mapapi.map.BaiduMapOptions
 import com.baidu.mapapi.map.MapPoi
-import com.baidu.mapapi.map.MapView
 import com.baidu.mapapi.map.MyLocationData
+import com.baidu.mapapi.map.TextureMapView
 import com.baidu.mapapi.model.LatLng
 import com.melody.map.baidu_compose.extensions.awaitMap
 import com.melody.map.baidu_compose.model.BDMapComposable
@@ -99,7 +99,7 @@ fun BDMap(
     }
     val context = LocalContext.current
     val mapView = remember {
-        MapView(context, bdMapOptionsFactory())
+        TextureMapView(context, bdMapOptionsFactory())
     }
     AndroidView(modifier = modifier, factory = { mapView }, onRelease = {
         runCatching { it.onDestroy() }
@@ -146,7 +146,7 @@ private suspend inline fun disposingComposition(factory: () -> Composition) {
     }
 }
 
-private suspend inline fun MapView.newComposition(
+private suspend inline fun TextureMapView.newComposition(
     parent: CompositionContext,
     noinline content: @Composable () -> Unit
 ): Composition {
@@ -159,7 +159,7 @@ private suspend inline fun MapView.newComposition(
 }
 
 @Composable
-private fun MapLifecycle(mapView: MapView) {
+private fun MapLifecycle(mapView: TextureMapView) {
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val previousState = remember { mutableStateOf(Lifecycle.Event.ON_CREATE) }
@@ -181,7 +181,7 @@ private fun MapLifecycle(mapView: MapView) {
     }
 }
 
-private fun MapView.lifecycleObserver(previousState: MutableState<Lifecycle.Event>): LifecycleEventObserver =
+private fun TextureMapView.lifecycleObserver(previousState: MutableState<Lifecycle.Event>): LifecycleEventObserver =
     LifecycleEventObserver { _, event ->
         when (event) {
             Lifecycle.Event.ON_CREATE ->  {

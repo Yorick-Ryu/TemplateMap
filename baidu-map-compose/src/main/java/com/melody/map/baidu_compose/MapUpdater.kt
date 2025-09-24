@@ -35,8 +35,8 @@ import com.baidu.mapapi.map.BaiduMap.OnMapStatusChangeListener
 import com.baidu.mapapi.map.MapPoi
 import com.baidu.mapapi.map.MapStatus
 import com.baidu.mapapi.map.MapStatusUpdateFactory
-import com.baidu.mapapi.map.MapView
 import com.baidu.mapapi.map.MyLocationData
+import com.baidu.mapapi.map.TextureMapView
 import com.baidu.mapapi.model.LatLng
 import com.melody.map.baidu_compose.model.BDCameraPosition
 import com.melody.map.baidu_compose.model.MapClickListeners
@@ -119,7 +119,7 @@ internal class MapPropertiesNode(
 @Suppress("NOTHING_TO_INLINE")
 @Composable
 internal inline fun MapUpdater(
-    mapView: MapView,
+    mapView: TextureMapView,
     mapUiSettings: MapUiSettings,
     clickListeners: MapClickListeners,
     locationSource: MyLocationData?,
