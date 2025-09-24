@@ -1,4 +1,4 @@
 <resources>
 
-    <style name="Theme.TemplateMap" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
+    <style name="Theme.TemplateMap" parent="Theme.Material3.Dark.NoActionBar" />
 </resources>
